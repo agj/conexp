@@ -7,6 +7,12 @@
     "name": "agj",
     "url": "http://agj.cl"
   },
+  "keywords": [
+    "concatenative",
+    "stacked",
+    "embedded",
+    "language"
+  ],
   "scripts": {
     "test": "node tests/"
   },
@@ -21,5 +27,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/agj/conexp.git"
+  },
+  "issues": {
+    "url": "https://github.com/agj/conexp/issues"
   }
 }
