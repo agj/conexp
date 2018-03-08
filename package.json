@@ -1,6 +1,6 @@
 {
   "name": "conexp",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Concatenative expressions: Minimal syntax for embedded languages.",
   "main": "index.js",
   "author": {
@@ -18,5 +18,8 @@
     "tape": "^4.9.0",
     "tape-catch": "^1.0.6"
   },
-  "private": true
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agj/conexp.git"
+  }
 }

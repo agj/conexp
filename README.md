@@ -35,6 +35,15 @@ evaluate('10 5 4 2 / - *'); //=> [30]
 ```
 
 
+## Installation
+
+With [Node][node] installed, type into the command line:
+
+```sh
+npm install conexp
+```
+
+
 ## The syntax
 
 The language evaluates [**postfix-notation**][postfix] expressions. This is unlike Javascript functions, which come before (and wrap) their arguments, and unlike math operators (such as `+`,) which come in between their arguments. Indeed, in our case, the functions/operators come _after_ the arguments. Like `3 2 +` or `"Hello world" print`.
@@ -87,9 +96,20 @@ const drop = a => [];
 const evaluate = conexp({ log, dup, swap, drop });
 
 evaluate('"Hello world!" log'); //=> ['Hello world!']
-                                // and will output the message to the console.
+                                // and will output the string to the console.
 evaluate('1 2 swap drop dup'); //=> [2, 2]
 ```
+
+
+## Generating and using the language
+
+All you need to do is pass the `conexp` function an object `functions` containing all functions your language will contain. Each key/value pair in the object indicates a name/function relationship within the language that will be generated.
+
+`conexp(functions)` → `function`
+
+The result of calling the `conexp` function is an `evaluate` function that takes in an `expression` as a string and evaluates it, returning an array of values.
+
+`evaluate(expression)` → `array`
 
 
 ## Current limitations
@@ -98,11 +118,13 @@ The syntax **does** support the following features:
 
 - Strings enclosed in `"` or `'`.
 - Positive integers and zero.
+- Functions.
 
-It **does not** support anything else, like:
+It **does not** yet support anything else, like:
 
 - Other types of numbers, such as negative or floating point.
-- Quotations (grouping tokens for later parsing, necessary for branching).
+- Quotations (grouping tokens for later parsing, necessary for branching, etc.).
+- Definitions.
 
-I will get around to these in the future.
+I will get around to (some of) these in the future.
 
