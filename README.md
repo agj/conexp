@@ -46,7 +46,7 @@ npm install conexp
 
 ## The syntax
 
-The language evaluates [**postfix-notation**][postfix] expressions. This is unlike Javascript functions, which come before (and wrap) their arguments, and unlike math operators (such as `+`,) which come in between their arguments. Indeed, in our case, the functions/operators come _after_ the arguments. Like `3 2 +` or `"Hello world" print`.
+The language evaluates [**postfix notation**][postfix] expressions. This is unlike Javascript functions, which come before (and wrap) their arguments, and unlike math operators (such as `+`,) which come in between their arguments. Indeed, in our case, the functions/operators come _after_ the arguments. Like `3 2 +` or `"Hello world" print`.
 
 Execution order is from left to right. It is performed by keeping a **stack** (basically a list) into which we push and pull values. Plain values are _pushed_ into the stack.
 
@@ -103,13 +103,19 @@ evaluate('1 2 swap drop dup'); //=> [2, 2]
 
 ## Generating and using the language
 
-All you need to do is pass the `conexp` function an object `functions` containing all functions your language will contain. Each key/value pair in the object indicates a name/function relationship within the language that will be generated.
+Define all the functions usable within your language in an object `functions`. Each key/value pair in this object should indicate an identifier/function relationship within the language that will be generated.
 
-`conexp(functions)` → `function`
+> `const functions = { identifier1: function1 /*, ... */ }`
 
-The result of calling the `conexp` function is an `evaluate` function that takes in an `expression` as a string and evaluates it, returning an array of values.
+Pass this object to the `conexp` function.
 
-`evaluate(expression)` → `array`
+> `const evaluate = conexp(functions)`
+
+The result of calling the `conexp` function is an `evaluate` function that takes in a string `expression`. It evaluates it, calling the functions you supplied when appropriate, and returns the array of values it produces.
+
+> `const result = evaluate(expression)`
+
+The `expression` should, of course, be formatted according to the syntax described in this document.
 
 
 ## Current limitations
@@ -125,6 +131,7 @@ It **does not** yet support anything else, like:
 - Other types of numbers, such as negative or floating point.
 - Quotations (grouping tokens for later parsing, necessary for branching, etc.).
 - Definitions.
+- Asynchronous code.
 
-I will get around to (some of) these in the future.
+I will get around to some of these in the future.
 
