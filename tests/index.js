@@ -1,7 +1,7 @@
 
 const test = require('tape-catch');
 
-const conex = require('../');
+const conexp = require('../');
 
 
 const dup = a => [a, a];
@@ -18,7 +18,7 @@ const uppercase = a => [a.toUpperCase()];
 
 test("Parse integers and strings.", assert => {
 	assert.plan(1);
-	const evaluate = conex({});
+	const evaluate = conexp({});
 	assert.deepEquals(
 		evaluate('1 "one?" "two!" 2 3 "and... three"'),
 		[1, 'one?', 'two!', 2, 3, 'and... three']);
@@ -26,7 +26,7 @@ test("Parse integers and strings.", assert => {
 
 test("Ignore whitespace.", assert => {
 	assert.plan(1);
-	const evaluate = conex({});
+	const evaluate = conexp({});
 	assert.deepEquals(
 		evaluate('    1   \t  "one?" \n\n "two!" 2  3    "and...\nthree"\n'),
 		[1, 'one?', 'two!', 2, 3, 'and...\nthree']);
@@ -34,7 +34,7 @@ test("Ignore whitespace.", assert => {
 
 test("Move integers around with functions.", assert => {
 	assert.plan(1);
-	const evaluate = conex({ dup, swap, drop });
+	const evaluate = conexp({ dup, swap, drop });
 	assert.deepEquals(
 		evaluate('1 2 3 swap drop dup'),
 		[1, 3, 3]);
@@ -42,7 +42,7 @@ test("Move integers around with functions.", assert => {
 
 test("Operate on integers.", assert => {
 	assert.plan(1);
-	const evaluate = conex({ add, subtract, multiply, divide, swap });
+	const evaluate = conexp({ add, subtract, multiply, divide, swap });
 	assert.deepEquals(
 		evaluate('32 4 3 2 1 subtract add multiply divide'),
 		[2]);
@@ -50,7 +50,7 @@ test("Operate on integers.", assert => {
 
 test("Operate on strings.", assert => {
 	assert.plan(1);
-	const evaluate = conex({ uppercase });
+	const evaluate = conexp({ uppercase });
 	assert.deepEquals(
 		evaluate('"Some" "Random String" uppercase'),
 		['Some', 'RANDOM STRING']);
@@ -58,7 +58,7 @@ test("Operate on strings.", assert => {
 
 test("Throw on unrecognized tokens.", assert => {
 	assert.plan(1);
-	const evaluate = conex({ add });
+	const evaluate = conexp({ add });
 	assert.throws(() => evaluate('2 3 add nonexistant'));
 });
 
