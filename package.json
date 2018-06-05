@@ -21,6 +21,7 @@
     "ramda": "^0.25.0"
   },
   "devDependencies": {
+    "blue-tape": "^1.0.0",
     "tape": "^4.9.0",
     "tape-catch": "^1.0.6"
   },
