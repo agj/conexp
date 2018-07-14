@@ -5,12 +5,28 @@ const conexp = require('../sync');
 const _ = require('./functions');
 
 
-test("Sync: Parse integers and strings.", assert => {
+test("Sync: Parse numbers.", assert => {
 	assert.plan(1);
 	const evaluate = conexp({});
 	assert.deepEquals(
-		evaluate('1 "one?" "two!" 2 3 "and... three"'),
-		[1, 'one?', 'two!', 2, 3, 'and... three']);
+		evaluate(`1 200 1.50 3. .5 -1 -200 -1.50 -3. -.5`),
+		[1, 200, 1.50, 3, 0.5, -1, -200, -1.50, -3, -0.5]);
+});
+
+test("Sync: Parse strings.", assert => {
+	assert.plan(1);
+	const evaluate = conexp({});
+	assert.deepEquals(
+		evaluate(`"double" 'single' "it's mixed" '"a"'`),
+		['double', 'single', "it's mixed", '"a"']);
+});
+
+test("Sync: Parse booleans.", assert => {
+	assert.plan(1);
+	const evaluate = conexp({});
+	assert.deepEquals(
+		evaluate(`true false`),
+		[true, false]);
 });
 
 test("Sync: Ignore whitespace.", assert => {
@@ -19,7 +35,7 @@ test("Sync: Ignore whitespace.", assert => {
 	assert.deepEquals(
 		evaluate('    1   \t  "one?" \n\n "two!" 2  3    "and...\nthree"\n'),
 		[1, 'one?', 'two!', 2, 3, 'and...\nthree']);
-})
+});
 
 test("Sync: Move integers around with functions.", assert => {
 	assert.plan(1);
