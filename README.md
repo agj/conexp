@@ -7,8 +7,12 @@ conexp
 
 Concatenative expressions, written in Javascript. An extremely simple syntax for defining embedded languages, for use with [Node][node].
 
+It takes [postfix code](#the-syntax) using functions you define, like `3 4 + 5 *`, and executes it to an array containing values, in this case `[35]` (the result of (3 + 4) * 5).
+
+By default works asynchronously (using promises), but also comes with a synchronous mode.
+
 [node]: https://nodejs.org/
-[wiki_concat]: https://en.wikipedia.org/wiki/Concatenative_programming_language
+[wiki-concat]: https://en.wikipedia.org/wiki/Concatenative_programming_language
 [postfix]: https://en.wikipedia.org/wiki/Reverse_Polish_notation
 [concat-org]: http://www.concatenative.org/wiki/view/Front%20Page
 [purdy]: https://evincarofautumn.blogspot.cl/2012/02/why-concatenative-programming-matters.html
@@ -29,10 +33,19 @@ const divide = (a, b) => [a / b];
 const evaluate = conexp({ '+': add, '-': subtract, '*': multiply, '/': divide });
 
 // Now to test it.
-evaluate('1 2 +'); //=> [3]
-evaluate('10 4 - 3 /'); //=> [3]
-evaluate('10 5 4 2 / - *'); //=> [30]
+evaluate('1 2 +');          //=> Promise([3])
+evaluate('10 4 - 3 /');     //=> Promise([3])
+evaluate('10 5 4 2 / - *'); //=> Promise([30])
 ```
+
+For synchronous evaluation, just require `'conexp/sync'`, like this:
+
+```js
+const conexp = require('conexp/sync');
+// ...
+evaluate('1 2 +'); //=> [3]
+```
+
 
 
 ## Installation
@@ -72,12 +85,12 @@ And finally, the last operation.
 
 Thus the result of evaluating the entire expression is an array containing the single value `30`.
 
-The syntax used is an elementary example of what is known as [_concatenative programming_][wiki_concat]. In essence, the above is all there is and all you need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
+The syntax used is an elementary example of what is known as [_concatenative programming_][wiki-concat]. In essence, the above is all there is and all you need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
 
 
 ## Defining functions
 
-Functions may take any number of arguments, and **must** return an array containing any number of return values. The arguments it receives are _popped_ from the stack, and the values it returns are _pushed_ into it. In the _Example_ section we see functions defined for several arithmetic operations. Here you have a few other types of possible functions:
+Functions may take any number of arguments, and **must** either return an array containing any number of return values, or a promise that returns one (when in asynchronous mode). The arguments it receives are _popped_ from the stack, and the values it returns are _pushed_ into it. In the _Example_ section we see functions defined for several arithmetic operations. Here you have a few other types of possible functions:
 
 ```js
 const conexp = require('conexp');
@@ -95,13 +108,20 @@ const drop = a => [];
 
 const evaluate = conexp({ log, dup, swap, drop });
 
-evaluate('"Hello world!" log'); //=> ['Hello world!']
+evaluate('"Hello world!" log'); //=> Promise(['Hello world!'])
                                 // and will output the string to the console.
-evaluate('1 2 swap drop dup'); //=> [2, 2]
+evaluate('1 2 swap drop dup');  //=> Promise([2, 2])
 ```
 
 
 ## Generating and using the language
+
+Import the module in either asynchronous or synchronous mode:
+
+```js
+require('conexp')      // Asynchronous (using promises)
+require('conexp/sync') // Synchronous
+```
 
 Define all the functions usable within your language in an object `functions`. Each key/value pair in this object should indicate an identifier/function relationship within the language that will be generated.
 
@@ -115,23 +135,22 @@ The result of calling the `conexp` function is an `evaluate` function that takes
 
 > `const result = evaluate(expression)`
 
-The `expression` should, of course, be formatted according to the syntax described in this document.
+The `expression` should, of course, be formatted according to the syntax described in this document. `result` will in this case be a promise that resolves into an array of values, or if using the synchronous mode, directly to said array.
 
 
 ## Current limitations
 
 The syntax **does** support the following features:
 
-- Strings enclosed in `"` or `'`.
-- Positive integers and zero.
+- Strings such as: `'hi'`, `"it's OK"`
+- Numbers such as `5`, `1.3`, `-800.17`
+- Booleans: `true` or `false`
 - Functions.
 
 It **does not** yet support anything else, like:
 
-- Other types of numbers, such as negative or floating point.
 - Quotations (grouping tokens for later parsing, necessary for branching, etc.).
 - Definitions.
-- Asynchronous code.
 
 I will get around to some of these in the future.
 
