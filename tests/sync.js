@@ -67,3 +67,11 @@ test("Sync: Throw on unrecognized tokens.", assert => {
 	assert.throws(() => evaluate('2 3 add nonexistant'));
 });
 
+test("Sync: Quotations.", assert => {
+	assert.plan(1);
+	const evaluate = conexp({  });
+	assert.deepEquals(
+		evaluate('"a" [ "b" ] "c"'),
+		['a', ['b'], 'c']);
+});
+
