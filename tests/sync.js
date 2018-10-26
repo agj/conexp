@@ -72,6 +72,6 @@ test("Sync: Quotations.", assert => {
 	const evaluate = conexp({  });
 	assert.deepEquals(
 		evaluate('"a" [ "b" ] "c"'),
-		['a', ['b'], 'c']);
+		['a', ['"b"'], 'c']);
 });
 
