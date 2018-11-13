@@ -2,6 +2,8 @@
 const R = require('ramda');
 const types = require('./types');
 
+const reString = /^(["'])((.|\n)*)\1$/m;
+
 const isNumber = R.test(/^-?(\d+\.?\d*|\d*\.?\d+)$/);
 const isString = R.test(reString);
 const isBoolean = R.test(/^(true|false)$/);

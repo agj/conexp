@@ -6,7 +6,7 @@ const parseStep = ({ parsed, remaining: [current, ...remaining] }) => {
 		return { parsed, remaining };
 	} else {
 		if (current.type === types.syntax && current.value === '[') {
-			const quotation = parse(remaining);
+			const quotation = parseStep({ parsed: [], remaining });
 			return parseStep({
 				parsed:    [...parsed, { type: types.quotation, value: quotation.parsed }],
 				remaining: quotation.remaining,
