@@ -5,33 +5,43 @@ const lexer = require('./lexer');
 const parser = require('./parser');
 const types = require('./types');
 
-// const step = R.curry((funs, stack, token, nextTokens) =>
-// 	isQuotation(token)        ? [stack, [token]]
-// 	: isNumber(token)         ? [stack, [toNumber(token)]]
-// 	: isString(token)         ? [stack, [toString(token)]]
-// 	: isBoolean(token)        ? [stack, [toBoolean(token)]]
-// 	: isFunction(funs, token) ? applyFunction(toFunction(funs, token), stack)
-// 	: badToken(token));
+const error = (msg) => { throw msg };
+const toToken = (value) =>
+	typeof value === 'boolean'  ? { type: 'boolean', value }
+	: typeof value === 'number' ? { type: 'number', value }
+	: typeof value === 'string' ? { type: 'string', value }
+	: Array.isArray(value)      ? { type: 'quotation', value }
+	: error(`Wrong value for token.`);
 
-// module.exports = funs => expr => {
-// 	const tokens = lexer(expr);
-// 	const parsed = parser(tokens);
-// 	return parsed.reduce(
-// 		R.pipe(step(funs), R.apply(R.concat)),
-// 		[]);
-// };
+const simpleMetaFunction = (f) => {
+	const nargs = f.length;
+	return (stack) =>
+		R.dropLast(nargs, stack)
+		.concat(f(...R.takeLast(nargs, stack)));
+};
+const simpleFunction = (f) => {
+	const nargs = f.length;
+	return (stack) =>
+		R.dropLast(nargs, stack)
+		.concat(f(...R.takeLast(nargs, stack).map(R.prop('value')))
+		        .map(toToken));
+};
 
-
-
-module.exports = funs => expr => {
+const conexp = funs => expr => {
 	const tokens = lexer(expr);
 	const parsed = parser(tokens);
 	const doit = (stack, [cur, ...remaining]) =>
 		cur
 			? cur.type === types.identifier
-				? doit(funs[cur.value](stack), remaining)
+				? doit([], funs[cur.value](stack).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
 	return doit([], parsed);
 };
+
+conexp.func = simpleFunction;
+conexp.metaFunc = simpleMetaFunction;
+
+
+module.exports = conexp;
 
