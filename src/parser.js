@@ -1,14 +1,14 @@
 
-const types = require('./types');
+const _ = require('./general');
 
 const parseStep = ({ parsed, remaining: [current, ...remaining] }) => {
-	if (current === undefined || current.type === types.syntax && current.value === ']') {
+	if (current === undefined || _.isSyntaxToken(current) && current.value === ']') {
 		return { parsed, remaining };
 	} else {
-		if (current.type === types.syntax && current.value === '[') {
+		if (_.isSyntaxToken(current) && current.value === '[') {
 			const quotation = parseStep({ parsed: [], remaining });
 			return parseStep({
-				parsed:    [...parsed, { type: types.quotation, value: quotation.parsed }],
+				parsed:    [...parsed, _.toQuotationToken(quotation.parsed)],
 				remaining: quotation.remaining,
 			});
 		} else {

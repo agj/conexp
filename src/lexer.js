@@ -1,6 +1,6 @@
 
 const R = require('ramda');
-const types = require('./types');
+const _ = require('./general');
 
 const reString = /^(["'])((.|\n)*)\1$/m;
 
@@ -18,11 +18,11 @@ const split = R.match(/(["'])(\\?.|\n)*?\1|\S+/g);
 const lexer = (code) =>
 	split(code)
 	.map((v) =>
-		isNumber(v)  ? { type: types.number,     value: toNumber(v) } :
-		isString(v)  ? { type: types.string,     value: toString(v) } :
-		isBoolean(v) ? { type: types.boolean,    value: toBoolean(v) } :
-		isSyntax(v)  ? { type: types.syntax,     value: v } :
-		               { type: types.identifier, value: v }
+		isNumber(v)  ? _.toNumberToken(toNumber(v)) :
+		isString(v)  ? _.toStringToken(toString(v)) :
+		isBoolean(v) ? _.toBooleanToken(toBoolean(v)) :
+		isSyntax(v)  ? _.toSyntaxToken(v) :
+		               _.toIdentifierToken(v)
 	);
 
 module.exports = lexer;

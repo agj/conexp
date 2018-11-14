@@ -3,30 +3,71 @@ const R = require('ramda');
 
 const log = R.tap(console.log);
 
-const reString = /^(["'])((.|\n)*)\1$/m;
+const error = (msg) => { throw msg };
 
-const isQuotation = Array.isArray;
-const isFunction = (funs, val) => R.has(val, funs);
-const toFunction = (funs, name) => funs[name];
+const types = {
+	number:     'number',
+	string:     'string',
+	boolean:    'boolean',
+	syntax:     'syntax',
+	identifier: 'identifier',
+	quotation:  'quotation',
+};
 
-const applyFunction = (fun, stack) =>
-	[R.dropLast(fun.length, stack),
-	 fun(...R.takeLast(fun.length, stack))];
-// const applyQuotation = (quot, stack) =>
-const badToken = token => { throw "Token is not valid: " + token };
+const to = (type) => (value) => ({ type, value });
+const is = (type) => (token) => token.type === type;
 
+const toNumberToken = to(types.number);
+const toStringToken = to(types.string);
+const toBooleanToken = to(types.boolean);
+const toSyntaxToken = to(types.syntax);
+const toIdentifierToken = to(types.identifier);
+const toQuotationToken = to(types.quotation);
 
-const step = R.curry((funs, stack, token, nextTokens) =>
-	isQuotation(token)        ? [stack, [token]]
-	: isNumber(token)         ? [stack, [toNumber(token)]]
-	: isString(token)         ? [stack, [toString(token)]]
-	: isBoolean(token)        ? [stack, [toBoolean(token)]]
-	: isFunction(funs, token) ? applyFunction(toFunction(funs, token), stack)
-	: badToken(token));
+const isNumberToken = is(types.number);
+const isStringToken = is(types.string);
+const isBooleanToken = is(types.boolean);
+const isSyntaxToken = is(types.syntax);
+const isIdentifierToken = is(types.identifier);
+const isQuotationToken = is(types.quotation);
+
+const toToken = (value) =>
+	typeof value === 'boolean'  ? toBooleanToken(value)
+	: typeof value === 'number' ? toNumberToken(value)
+	: typeof value === 'string' ? toStringToken(value)
+	: Array.isArray(value)      ? toQuotationToken(value)
+	: error(`Wrong value for token: ${ value }`);
+
+const simpleMetaFunction = (f) => {
+	const nargs = f.length;
+	return (stack) =>
+		R.dropLast(nargs, stack)
+		.concat(f(...R.takeLast(nargs, stack)));
+};
+const simpleFunction = (f) => {
+	const nargs = f.length;
+	return (stack) =>
+		R.dropLast(nargs, stack)
+		.concat(f(...R.takeLast(nargs, stack).map(R.prop('value')))
+		        .map(toToken));
+};
 
 
 module.exports = {
-	getTokens,
-	parse,
-	step,
+	toNumberToken,
+	toStringToken,
+	toBooleanToken,
+	toSyntaxToken,
+	toIdentifierToken,
+	toQuotationToken,
+
+	isNumberToken,
+	isStringToken,
+	isBooleanToken,
+	isSyntaxToken,
+	isIdentifierToken,
+	isQuotationToken,
+
+	simpleFunction,
+	simpleMetaFunction,
 };

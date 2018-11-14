@@ -1,31 +1,9 @@
 
 const R = require('ramda');
-// const _ = require('./general');
+const _ = require('./general');
 const lexer = require('./lexer');
 const parser = require('./parser');
 const types = require('./types');
-
-const error = (msg) => { throw msg };
-const toToken = (value) =>
-	typeof value === 'boolean'  ? { type: 'boolean', value }
-	: typeof value === 'number' ? { type: 'number', value }
-	: typeof value === 'string' ? { type: 'string', value }
-	: Array.isArray(value)      ? { type: 'quotation', value }
-	: error(`Wrong value for token.`);
-
-const simpleMetaFunction = (f) => {
-	const nargs = f.length;
-	return (stack) =>
-		R.dropLast(nargs, stack)
-		.concat(f(...R.takeLast(nargs, stack)));
-};
-const simpleFunction = (f) => {
-	const nargs = f.length;
-	return (stack) =>
-		R.dropLast(nargs, stack)
-		.concat(f(...R.takeLast(nargs, stack).map(R.prop('value')))
-		        .map(toToken));
-};
 
 const conexp = funs => expr => {
 	const tokens = lexer(expr);
@@ -39,8 +17,8 @@ const conexp = funs => expr => {
 	return doit([], parsed);
 };
 
-conexp.func = simpleFunction;
-conexp.metaFunc = simpleMetaFunction;
+conexp.func = _.simpleFunction;
+conexp.metaFunc = _.simpleMetaFunction;
 
 
 module.exports = conexp;
