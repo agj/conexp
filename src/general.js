@@ -14,7 +14,7 @@ const types = {
 	quotation:  'quotation',
 };
 
-const value = (token) => token.value;
+const getValue = (token) => isQuotationToken(token) ? token.value.map(getValue) : token.value;
 const to = (type) => (value) => ({ type, value });
 const is = (type) => (token) => token.type === type;
 
@@ -69,7 +69,7 @@ module.exports = {
 	isIdentifierToken,
 	isQuotationToken,
 
-	value,
+	getValue,
 	simpleFunction,
 	simpleMetaFunction,
 };

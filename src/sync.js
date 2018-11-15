@@ -11,12 +11,14 @@ const conexp = funs => expr => {
 	const doit = (stack, [cur, ...remaining]) =>
 		cur
 			? cur.type === types.identifier
-				? doit([], funs[_.value(cur)](stack).concat(remaining))
+				? doit([], funs[_.getValue(cur)](stack).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
-	return doit([], parsed);
+	const result = doit([], parsed);
+	return result.map(_.getValue);
 };
 
+conexp.value = _.getValue;
 conexp.func = _.simpleFunction;
 conexp.metaFunc = _.simpleMetaFunction;
 

@@ -2,10 +2,10 @@
 const _ = require('./general');
 
 const parseStep = ({ parsed, remaining: [current, ...remaining] }) => {
-	if (current === undefined || _.isSyntaxToken(current) && _.value(current) === ']') {
+	if (current === undefined || _.isSyntaxToken(current) && _.getValue(current) === ']') {
 		return { parsed, remaining };
 	} else {
-		if (_.isSyntaxToken(current) && _.value(current) === '[') {
+		if (_.isSyntaxToken(current) && _.getValue(current) === '[') {
 			const quotation = parseStep({ parsed: [], remaining });
 			return parseStep({
 				parsed:    [...parsed, _.toQuotationToken(quotation.parsed)],
