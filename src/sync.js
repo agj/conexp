@@ -11,7 +11,7 @@ const conexp = funs => expr => {
 	const doit = (stack, [cur, ...remaining]) =>
 		cur
 			? cur.type === types.identifier
-				? doit([], funs[cur.value](stack).concat(remaining))
+				? doit([], funs[_.value(cur)](stack).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
 	return doit([], parsed);

@@ -2,7 +2,7 @@
 const R = require('ramda');
 const conexp = require('./sync');
 
-const log = R.tap(console.log);
+const log = m => console.log(JSON.stringify(m, null, '  '));
 
 
 const evaluate = conexp({
