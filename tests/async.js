@@ -2,7 +2,6 @@
 const test = require('blue-tape');
 
 const conexp = require('../');
-const _ = require('./functions');
 
 const delay = (msg, ms) => new Promise(resolve => setTimeout(() => resolve([msg]), ms));
 

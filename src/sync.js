@@ -3,14 +3,13 @@ const R = require('ramda');
 const _ = require('./general');
 const lexer = require('./lexer');
 const parser = require('./parser');
-const types = require('./types');
 
 const conexp = funs => expr => {
 	const tokens = lexer(expr);
 	const parsed = parser(tokens);
 	const doit = (stack, [cur, ...remaining]) =>
 		cur
-			? cur.type === types.identifier
+			? _.isIdentifierToken(cur)
 				? doit([], funs[_.getValue(cur)](stack).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
