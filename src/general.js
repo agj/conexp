@@ -35,7 +35,7 @@ const toToken = (value) =>
 	typeof value === 'boolean'  ? toBooleanToken(value)
 	: typeof value === 'number' ? toNumberToken(value)
 	: typeof value === 'string' ? toStringToken(value)
-	: Array.isArray(value)      ? toQuotationToken(value)
+	: Array.isArray(value)      ? toQuotationToken(value.map(toToken))
 	: error(`Wrong value for token: ${ value }`);
 
 const simpleMetaFunction = (f) => {
