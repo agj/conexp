@@ -7,7 +7,7 @@ const functions = require('../functions');
 
 test("Functions: Number matches.", assert => {
 	assert.plan(1);
-	assert.equals(Object.keys(functions).length, 4);
+	assert.equals(Object.keys(functions).length, 6);
 });
 
 test("Functions: id.", assert => {
@@ -40,6 +40,22 @@ test("Functions: swap.", assert => {
 	assert.deepEquals(
 		evaluate(`1 2 swap`),
 		[2, 1]);
+});
+
+test("Functions: quote.", assert => {
+	assert.plan(1);
+	const evaluate = conexp({ quote: functions.quote });
+	assert.deepEquals(
+		evaluate(`1 1 quote`),
+		[1, [1]]);
+});
+
+test("Functions: dequote.", assert => {
+	assert.plan(1);
+	const evaluate = conexp({ dequote: functions.dequote });
+	assert.deepEquals(
+		evaluate(`[ 1 ] [ 1 ] dequote`),
+		[[1], 1]);
 });
 
 
