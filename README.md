@@ -27,7 +27,7 @@ By default works asynchronously (using promises), but also comes with a synchron
 const conexp = require('conexp');
 const func = conexp.func;
 
-// First let's define some functions for our language.
+// First let's define some functions for a calculator language.
 
 const add =      func((a, b) => [a + b]);
 const subtract = func((a, b) => [a - b]);
@@ -38,14 +38,13 @@ const divide =   func((a, b) => [a / b]);
 
 const evaluate = conexp({ '+': add, '-': subtract, '*': multiply, '/': divide });
 
-// Now to test it.
+// Now let's use it to calculate some arithmetic.
 
 evaluate('1 2 +');          //=> Promise([3])
 evaluate('10 4 - 3 /');     //=> Promise([3])
-evaluate('10 5 4 2 / - *'); //=> Promise([30])
 ```
 
-As you can see, when evaluating code, a promise is returned. For synchronous evaluation, just require `'conexp/sync'` instead, like this:
+When evaluating code, a promise is returned. For synchronous evaluation, we can require `'conexp/sync'` instead, like this:
 
 ```js
 const conexp = require('conexp/sync');
@@ -145,42 +144,114 @@ Execution order is from left to right. It is performed by keeping a **stack** (b
 
 Let's take the previous _Example_ section's last line's expression and start analyzing it step by step. This is the expression:
 
-`10 5 4 2 / - *`
+`10 4 - 3 /`
 
 Since execution order is unambiguous using this syntax, parentheses are not needed, and not used.
 
-The first four tokens `10 5 4 2` push four values into the stack, namely `10`, `5`, `4`, and `2`. So our stack and remainder of the expression look like this:
+The first two tokens `10 4` push two values into the stack, namely `10` and `4`. So our stack and remainder of the expression look like this:
 
-`10 5 4 2` ← `/ - *`  
+`10 4` ← `- 3 /`  
 (To the left the stack, to the right the remainder of the program)
 
-Next we have the function `/`. This, by its definition in the javascript code above, takes two values and returns one. This means that it _pops_ the last two values from the stack and operates on them, and then _pushes_ the result, 4 ÷ 2 = `2` into the stack.
+Next we have the function `-`. This, by its definition in the javascript code above, takes two values and returns one. This means that it _pops_ the last two values from the stack and operates on them, and then _pushes_ the result, 10 - 4 = `6`, into the stack.
 
-`10 5 2` ← `- *`
+`6` ← `3 /`
 
-Where `4 2` used to be now there's `2`, the result of their division. Next we have `-`, which does a similar thing: it evaluates 5 - 2 = `3`.
+Where `10 4` used to be now there's a `6`, the result of their subtraction. Next, we push one more value, `3`.
 
-`10 3` ← `*`
+`6 3` ← `/`
 
-And finally, the last operation.
+And lastly we have `/`, which again operates on the stack: it evaluates 6 ÷ 3 = `2`.
 
-`30` ←
+`2` ←
 
-The result of evaluating the entire expression is an array containing the single value `30`.
+The result of evaluating the entire expression is an array containing the single value `2`.
 
-The syntax used is an elementary example of what is known as [_concatenative programming_][wiki-concat]. In essence, the above is all there is and all you need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
+The syntax used is an elementary example of what is known as [_concatenative programming_][wiki-concat]. In essence, the above is most that you'll need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
 
 
 
-## Current limitations
+## API
 
-The syntax **does** support the following features:
+### `conexp(functions)`
+
+### `conexp.func(func)`
+
+### `conexp.metaFunc(func)`
+
+### `conexp.value(token)`
+
+Returns the raw value of `token`.
+
+### `conexp.is*Token(token)`
+
+Comprises: `isNumberToken`, `isStringToken`, `isBooleanToken`, `isSyntaxToken`, `isIdentifierToken`, `isQuotationToken`.
+
+These functions return a boolean value indicating whether `token` is of the particular type.
+
+### `conexp.to*Token(rawValue)`
+
+Comprises: `toNumberToken`, `toStringToken`, `toBooleanToken`, `toSyntaxToken`, `toIdentifierToken`, `toQuotationToken`.
+
+These functions construct a token of the particular type that represents the `rawValue`.
+
+
+
+## Included functions
+
+A small library of functions is provided for convenience. Just require it as follows:
+
+```js
+const functions = require('conexp/functions');
+```
+
+### `id`
+
+> `a id` → `a`
+
+Returns the same value.
+
+### `dup`
+
+> `a dup` → `a a`
+
+Duplicates a value.
+
+### `drop`
+
+> `a drop` → ` `
+
+Removes a value from the stack.
+
+### `swap`
+
+> `a b swap` → `b a`
+
+Swaps two values in place.
+
+### `quote`
+
+> `a quote` → `[ a ]`
+
+Wraps one value in a quotation.
+
+### `dequote`
+
+> `[ a ] dequote` → `a`
+
+Puts the contents of a quotation into the stack.
+
+
+
+## Values and quotations
+
+The following are valid values:
 
 - Strings such as: `'hi'`, `"it's OK"`
 - Numbers such as `5`, `1.3`, `-800.17`
 - Booleans: `true` or `false`
-- Functions.
-- Quotations (grouping tokens for later parsing, necessary for branching, etc.).
+- Identifiers that map to functions.
 
-I will get around to some of these in the future.
+In addition, to delay execution of code there is the functionality called **quotations**.
+
 
