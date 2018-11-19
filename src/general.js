@@ -39,17 +39,24 @@ const toToken = (value) =>
 	: Array.isArray(value)      ? toQuotationToken(value.map(toToken))
 	: error(`Wrong value for token: ${ value }`);
 
+const simpleFunction = (f) => {
+	const nargs = f.length;
+	return (stack) =>
+		R.dropLast(nargs, stack)
+		.concat(f(...R.takeLast(nargs, stack).map(R.prop('value')))
+		        .map(toToken));
+};
 const simpleMetaFunction = (f) => {
 	const nargs = f.length;
 	return (stack) =>
 		R.dropLast(nargs, stack)
 		.concat(f(...R.takeLast(nargs, stack)));
 };
-const simpleFunction = (f) => {
+const simpleAsyncFunction = (f) => {
 	const nargs = f.length;
-	return (stack) =>
+	return async (stack) =>
 		R.dropLast(nargs, stack)
-		.concat(f(...R.takeLast(nargs, stack).map(R.prop('value')))
+		.concat((await f(...R.takeLast(nargs, stack))).map(R.prop('value'))
 		        .map(toToken));
 };
 
@@ -72,4 +79,5 @@ module.exports = {
 	getValue,
 	simpleFunction,
 	simpleMetaFunction,
+	simpleAsyncFunction,
 };

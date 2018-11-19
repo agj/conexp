@@ -1,13 +1,25 @@
 
 const R = require('ramda');
 const _ = require('./general');
+const lexer = require('./lexer');
+const parser = require('./parser');
 
-module.exports = funs => expr => {
-	const tokens = _.getTokens(expr);
-	return tokens.reduce(
-		async (p, cur) => {
-			const result = await Promise.all(_.step(funs, await p, cur));
-			return R.apply(R.concat, result);
-		},
-		Promise.resolve([]));
+const conexp = (funs) => async (expr) => {
+	const tokens = lexer(expr);
+	const parsed = parser(tokens);
+	const doit = async (stack, [cur, ...remaining]) =>
+		cur
+			? _.isIdentifierToken(cur)
+				? doit([], (await funs[_.getValue(cur)](stack)).concat(remaining))
+				: doit(R.append(cur, stack), remaining)
+			: stack;
+	const result = await doit([], parsed);
+	return result.map(_.getValue);
 };
+
+conexp.value = _.getValue;
+conexp.func = _.simpleAsyncFunction;
+conexp.metaFunc = _.simpleMetaFunction;
+
+
+module.exports = conexp;

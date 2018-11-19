@@ -2,7 +2,6 @@
 const test = require('blue-tape');
 
 const conexp = require('../sync');
-const functions = require('../functions');
 const { func, metaFunc } = conexp;
 
 
@@ -16,4 +15,5 @@ const uppercase = func(a => [a.toUpperCase()]);
 
 require('./parsing');
 require('./functions');
+require('./async');
 

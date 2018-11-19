@@ -4,7 +4,7 @@ const _ = require('./general');
 const lexer = require('./lexer');
 const parser = require('./parser');
 
-const conexp = funs => expr => {
+const conexp = (funs) => (expr) => {
 	const tokens = lexer(expr);
 	const parsed = parser(tokens);
 	const doit = (stack, [cur, ...remaining]) =>
