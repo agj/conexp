@@ -37,7 +37,7 @@ const toToken = (value) =>
 	: typeof value === 'number' ? toNumberToken(value)
 	: typeof value === 'string' ? toStringToken(value)
 	: Array.isArray(value)      ? toQuotationToken(value.map(toToken))
-	: error(`Wrong value for token: ${ value }`);
+	: error(`Value cannot be converted to token: ${ value }`);
 
 const simpleFunction = (f) => {
 	const nargs = f.length;
@@ -56,7 +56,7 @@ const simpleAsyncFunction = (f) => {
 	const nargs = f.length;
 	return async (stack) =>
 		R.dropLast(nargs, stack)
-		.concat((await f(...R.takeLast(nargs, stack))).map(R.prop('value'))
+		.concat((await f(...R.takeLast(nargs, stack).map(R.prop('value'))))
 		        .map(toToken));
 };
 
