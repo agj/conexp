@@ -64,6 +64,41 @@ npm install conexp
 
 
 
+## The syntax
+
+The language evaluates [**postfix notation**][postfix] expressions. Consider these equivalent functions and operators that take two arguments:
+
+| other                | postfix            |
+| -------------------- | ------------------ |
+| `someFunction(a, b)` | `a b someFunction` |
+| `a + b`              | `a b +`            |
+
+That is, in postfix notation **the functions and operators come _after_ the arguments.**
+
+Let's interpret the previous [_Example_](#example) section's last line's expression (`10 4 - 3 /`) and analyze it step by step using a replacement strategy. **Evaluation is always done left to right**, performing any necessary replacements that functions dictate. Consider two functions, `-` (subtraction) and `/` (division).
+
+```
+10 4 - 3 /    The original expression.
+6 3 /         We applied `-` against `10` and `4`, i.e. 10 - 4 = 6.
+2             We applied `/` against `6` and `3`, i.e. 6 ÷ 3 = 2.
+```
+
+So `2` is our result. Note that since evaluation order is unambiguous using this syntax, parentheses are not needed, and not used.
+
+### Quotations
+
+Quotations are a feature that can be thought of as both lists and anonymous functions. They are sub-expressions enclosed in `[ ]`, which are not evaluated until necessary.
+
+```
+[ = 10 ] [  ] [  ] ifte
+```
+
+### Where this came from
+
+The syntax that conexp uses is an elementary example of what is known as [_concatenative programming_][wiki-concat], and based on they Joy programming language by Manfred von Thun. In essence, the above is most that you'll need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
+
+
+
 ## How to use
 
 Import the module in either asynchronous or synchronous modes:
@@ -102,30 +137,25 @@ The `expression` should be formatted according to [the syntax as described in th
 
 ## Defining functions
 
-Internally it's a bit more involved. But by wrapping your function with the **`conexp.func`** utility function, all you need to do is create functions that **take any number of arguments**, and in turn either **return an array** containing any number of return values, or a **promise** that resolves into such an array (when in asynchronous mode).
+Functions take a `stack`, which is a list of everything to the left of the function, and must return an updated stack (or a promise thereof). But the simplest way to define functions is by wrapping them with the **`conexp.func`** utility function. All you need to do is create functions that **take any number of arguments**, and in turn either **return an array** containing any number of return values, or a **promise** that resolves into such an array (when in asynchronous mode).
 
-The arguments it receives are _popped_ from the stack, and the values it returns are _pushed_ into it. In the _Example_ section we see functions defined for several arithmetic operations. Here you have a few other types of possible functions:
+The arguments it receives are _popped_ from the right end of the stack, and the values it returns are _pushed_ back into it. In the [_Example_](#example) section we see functions defined for several arithmetic operations. Here you have a few other types of possible functions:
 
 ```js
 const conexp = require('conexp');
 const func = conexp.func;
 
-// Output.
-const log = func((a) => {
+const log = func((a) => { // Outputs its argument to the console.
     console.log(a);
     return []; // Always return an array, even if empty.
 });
+const dup =  func((a) => [a, a]);    // Duplicates an argument.
 
-// Combinators.
-const dup =  func((a) => [a, a]);    // Takes one argument, returns it duplicated.
-const swap = func((a, b) => [b, a]); // Takes two arguments and swaps them in order.
-const drop = func((a) => []);        // Takes an argument and makes it disappear.
-
-const evaluate = conexp({ log, dup, swap, drop });
+const evaluate = conexp({ log, dup });
 
 evaluate('"Hello world!" log'); //=> Promise([])
                                 // and will output the string to the console.
-evaluate('1 2 swap drop dup');  //=> Promise([2, 2])
+evaluate('7 dup dup');  //=> Promise([7, 7, 7])
 ```
 
 ### Use `metaFunc` to go deeper
@@ -136,64 +166,31 @@ Some times you want to do more complex stuff in your function. For this, you may
 
 
 
-## The syntax
-
-The language evaluates [**postfix notation**][postfix] expressions. In this notation, a function that takes two arguments, represented in javascript as `someFunction(a, b)` would be represented instead as `a b someFunction`. A typical sum like `1 + 2` would instead be `1 2 +`. That is, in our case, **the functions or operators come _after_ the arguments.**
-
-Execution order is from left to right. It is performed by keeping a **stack** (basically a list) into which we push and pull values. Plain values are _pushed_ into the stack. Functions _pull_ values from it to read, and then push new ones.
-
-Let's take the previous _Example_ section's last line's expression and start analyzing it step by step. This is the expression:
-
-`10 4 - 3 /`
-
-Since execution order is unambiguous using this syntax, parentheses are not needed, and not used.
-
-The first two tokens `10 4` push two values into the stack, namely `10` and `4`. So our stack and remainder of the expression look like this:
-
-`10 4` ← `- 3 /`  
-(To the left the stack, to the right the remainder of the program)
-
-Next we have the function `-`. This, by its definition in the javascript code above, takes two values and returns one. This means that it _pops_ the last two values from the stack and operates on them, and then _pushes_ the result, 10 - 4 = `6`, into the stack.
-
-`6` ← `3 /`
-
-Where `10 4` used to be now there's a `6`, the result of their subtraction. Next, we push one more value, `3`.
-
-`6 3` ← `/`
-
-And lastly we have `/`, which again operates on the stack: it evaluates 6 ÷ 3 = `2`.
-
-`2` ←
-
-The result of evaluating the entire expression is an array containing the single value `2`.
-
-The syntax used is an elementary example of what is known as [_concatenative programming_][wiki-concat]. In essence, the above is most that you'll need to know—it's quite simple. However, if you wanna delve deeper into the esoterica behind the concatenative approach, you may read [John Purdy's _Why concatenative programming matters_][purdy], browse the [concatenative.org wiki][concat-org], or read [Brent Kerby's _The theory of concatenative combinators_][kerby].
-
-
-
 ## API
 
 ### `conexp(functions)`
 
+Generates a language using the function definitions specified in `functions` ([see how to define them](#defining-functions)). Returns the `evaluate(expression)` function for the language, which takes a string `expression` and returns an array of values.
+
 ### `conexp.func(func)`
 
-### `conexp.metaFunc(func)`
+Allows function `func` to take arguments however many arguments it needs and return an array of values, or a promise. [See how to use it.](#defining-functions)
 
 ### `conexp.value(token)`
 
-Returns the raw value of `token`.
+Returns the raw name of an identifier or a syntax token `token`. For instance, for a identifier token of a function `dup` it will return the string `"dup"`.
 
-### `conexp.is*Token(token)`
+### `conexp.is*(token)`
 
-Comprises: `isNumberToken`, `isStringToken`, `isBooleanToken`, `isSyntaxToken`, `isIdentifierToken`, `isQuotationToken`.
+Comprises: `isNumber`, `isString`, `isBoolean`, `isSyntax`, `isIdentifier`, `isQuotation`.
 
 These functions return a boolean value indicating whether `token` is of the particular type.
 
-### `conexp.to*Token(rawValue)`
+### `conexp.to*(value)`
 
-Comprises: `toNumberToken`, `toStringToken`, `toBooleanToken`, `toSyntaxToken`, `toIdentifierToken`, `toQuotationToken`.
+Comprises: `toIdentifier`, `toSyntax`.
 
-These functions construct a token of the particular type that represents the `rawValue`.
+These functions construct a token of the particular type, that represents the `value`. For instance, `toIdentifier("dup")` will construct an identifier token that maps to the function `dup`.
 
 
 
