@@ -8,29 +8,27 @@ const conexp = (funs) => (expr) => {
 	const tokens = lexer(expr);
 	const parsed = parser(tokens);
 	const doit = (stack, [cur, ...remaining]) =>
-		cur
-			? _.isIdentifierToken(cur)
+		cur !== void 0
+			? _.isIdentifier(cur)
 				? doit([], funs[_.getValue(cur)](stack).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
 	const result = doit([], parsed);
-	return result.map(_.getValue);
+	return result;
 };
 
 conexp.value = _.getValue;
 conexp.func = _.simpleFunction;
-conexp.metaFunc = _.simpleMetaFunction;
 
-conexp.isNumberToken = _.isNumberToken;
-conexp.isStringToken = _.isStringToken;
-conexp.isBooleanToken = _.isBooleanToken;
-conexp.isSyntaxToken = _.isSyntaxToken;
-conexp.isIdentifierToken = _.isIdentifierToken;
-conexp.isQuotationToken = _.isQuotationToken;
+conexp.isNumber = _.isNumber;
+conexp.isString = _.isString;
+conexp.isBoolean = _.isBoolean;
+conexp.isQuotation = _.isQuotation;
+conexp.isIdentifier = _.isIdentifier;
+conexp.isSyntax = _.isSyntax;
 
-conexp.toToken = _.toToken;
-conexp.toSyntaxToken = _.toSyntaxToken;
-conexp.toIdentifierToken = _.toIdentifierToken;
+conexp.toIdentifier = _.toIdentifier;
+conexp.toSyntax = _.toSyntax;
 
 
 module.exports = conexp;

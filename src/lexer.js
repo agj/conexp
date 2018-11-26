@@ -18,11 +18,11 @@ const split = R.match(/(["'])(\\?.|\n)*?\1|\S+/g);
 const lexer = (code) =>
 	split(code)
 	.map((v) =>
-		isNumber(v)  ? _.toNumberToken(toNumber(v)) :
-		isString(v)  ? _.toStringToken(toString(v)) :
-		isBoolean(v) ? _.toBooleanToken(toBoolean(v)) :
-		isSyntax(v)  ? _.toSyntaxToken(v) :
-		               _.toIdentifierToken(v)
+		isNumber(v)  ? toNumber(v) :
+		isString(v)  ? toString(v) :
+		isBoolean(v) ? toBoolean(v) :
+		isSyntax(v)  ? _.toSyntax(v) :
+		               _.toIdentifier(v)
 	);
 
 module.exports = lexer;

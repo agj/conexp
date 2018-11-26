@@ -9,17 +9,16 @@ const conexp = (funs) => async (expr) => {
 	const parsed = parser(tokens);
 	const doit = async (stack, [cur, ...remaining]) =>
 		cur
-			? _.isIdentifierToken(cur)
+			? _.isIdentifier(cur)
 				? doit([], (await funs[_.getValue(cur)](stack)).concat(remaining))
 				: doit(R.append(cur, stack), remaining)
 			: stack;
 	const result = await doit([], parsed);
-	return result.map(_.getValue);
+	return result;
 };
 
 conexp.value = _.getValue;
 conexp.func = _.simpleAsyncFunction;
-conexp.metaFunc = _.simpleMetaFunction;
 
 
 module.exports = conexp;

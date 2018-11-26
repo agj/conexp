@@ -1,7 +1,6 @@
 
 const _ = require('./src/general');
 const func = _.simpleFunction;
-const metaFunc = _.simpleMetaFunction;
 
 module.exports = {
 	id:   func((a) => [a]),
@@ -10,7 +9,7 @@ module.exports = {
 	swap: func((a, b) => [b, a]),
 
 	quote: func((a) => [[a]]),
-	dequote: metaFunc((quote) => quote.value),
+	dequote: func((quote) => quote),
 
 	// eq: func((a, b) => [a === b]),
 	// gt: func((a, b) => [a > b]),

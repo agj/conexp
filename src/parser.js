@@ -2,13 +2,13 @@
 const _ = require('./general');
 
 const parseStep = ({ parsed, remaining: [current, ...remaining] }) => {
-	if (current === undefined || _.isSyntaxToken(current) && _.getValue(current) === ']') {
+	if (current === undefined || _.isSyntax(current) && _.getValue(current) === ']') {
 		return { parsed, remaining };
 	} else {
-		if (_.isSyntaxToken(current) && _.getValue(current) === '[') {
+		if (_.isSyntax(current) && _.getValue(current) === '[') {
 			const quotation = parseStep({ parsed: [], remaining });
 			return parseStep({
-				parsed:    [...parsed, _.toQuotationToken(quotation.parsed)],
+				parsed:    [...parsed, quotation.parsed],
 				remaining: quotation.remaining,
 			});
 		} else {
