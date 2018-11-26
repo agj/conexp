@@ -45,11 +45,11 @@ testFunction("Functions: swap.", { swap: functions.swap },
 	[2, 1]);
 
 testFunction("Functions: quote.", { quote: functions.quote },
-	`1 1 quote`,
-	[1, [1]]);
+	`1 1 quote 1 quote quote`,
+	[1, [1], [[1]]]);
 
 testFunction("Functions: dequote.", { dequote: functions.dequote },
-	`[ 1 ] [ 1 ] dequote`,
-	[[1], 1]);
+	`[ 1 ] [ 1 ] dequote [ [ 1 ] ] dequote [ [ 1 ] ] dequote dequote`,
+	[[1], 1, [1], 1]);
 
 

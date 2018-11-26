@@ -21,9 +21,9 @@ const is = (type) => (token) => token.type === type;
 const toNumberToken = to(types.number);
 const toStringToken = to(types.string);
 const toBooleanToken = to(types.boolean);
+const toQuotationToken = to(types.quotation);
 const toSyntaxToken = to(types.syntax);
 const toIdentifierToken = to(types.identifier);
-const toQuotationToken = to(types.quotation);
 
 const isNumberToken = is(types.number);
 const isStringToken = is(types.string);
@@ -62,12 +62,13 @@ const simpleAsyncFunction = (f) => {
 
 
 module.exports = {
+	toToken,
 	toNumberToken,
 	toStringToken,
 	toBooleanToken,
+	toQuotationToken,
 	toSyntaxToken,
 	toIdentifierToken,
-	toQuotationToken,
 
 	isNumberToken,
 	isStringToken,

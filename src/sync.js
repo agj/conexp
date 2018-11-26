@@ -21,19 +21,16 @@ conexp.value = _.getValue;
 conexp.func = _.simpleFunction;
 conexp.metaFunc = _.simpleMetaFunction;
 
-conexp.isNumber = _.isNumberToken;
-conexp.isString = _.isStringToken;
-conexp.isBoolean = _.isBooleanToken;
-conexp.isSyntax = _.isSyntaxToken;
-conexp.isIdentifier = _.isIdentifierToken;
-conexp.isQuotation = _.isQuotationToken;
+conexp.isNumberToken = _.isNumberToken;
+conexp.isStringToken = _.isStringToken;
+conexp.isBooleanToken = _.isBooleanToken;
+conexp.isSyntaxToken = _.isSyntaxToken;
+conexp.isIdentifierToken = _.isIdentifierToken;
+conexp.isQuotationToken = _.isQuotationToken;
 
-conexp.toNumber = _.toNumberToken;
-conexp.toString = _.toStringToken;
-conexp.toBoolean = _.toBooleanToken;
-conexp.toSyntax = _.toSyntaxToken;
-conexp.toIdentifier = _.toIdentifierToken;
-conexp.toQuotation = _.toQuotationToken;
+conexp.toToken = _.toToken;
+conexp.toSyntaxToken = _.toSyntaxToken;
+conexp.toIdentifierToken = _.toIdentifierToken;
 
 
 module.exports = conexp;
