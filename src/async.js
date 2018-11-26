@@ -20,5 +20,15 @@ const conexp = (funs) => async (expr) => {
 conexp.value = _.getValue;
 conexp.func = _.simpleAsyncFunction;
 
+conexp.isNumber = _.isNumber;
+conexp.isString = _.isString;
+conexp.isBoolean = _.isBoolean;
+conexp.isQuotation = _.isQuotation;
+conexp.isIdentifier = _.isIdentifier;
+conexp.isSyntax = _.isSyntax;
+
+conexp.toIdentifier = _.toIdentifier;
+conexp.toSyntax = _.toSyntax;
+
 
 module.exports = conexp;
